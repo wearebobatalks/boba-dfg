@@ -1,12 +1,29 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Modal from "./components/Modal";
+import React, { useState } from "react";
 
-const App = () => {
+function App() {
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
-    <div className="w-full p-6">
+    <div className="App">
       <Navbar />
+      <div>
+        <button
+          className="openModalBtn"
+          onClick={() => {
+            setModalOpen(true);
+          }}
+        >
+          Log In
+        </button>
+
+        {modalOpen && <Modal setOpenModal={setModalOpen} />}
+      </div>
       <Outlet />
     </div>
   );
-};
-export default App
+}
+
+export default App;
