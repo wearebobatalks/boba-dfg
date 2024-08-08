@@ -1,7 +1,11 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
+// import dotenv from 'dotenv';
+// dotenv.config();
 
-//const uri = process.env.ATLAS_URI || "";
-const client = new MongoClient("mongodb+srv://boba-1:bobatalks@cluster0.mxunr5y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
+// Replace the uri string with config env.
+const uri = process.env.ATLAS_URI;
+// const uri = "mongodb+srv://admin:mWu2vMHAQfcDMyay@boba-talks.8ltm5.mongodb.net/?retryWrites=true&w=majority&appName=boba-talks";
+const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
