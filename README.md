@@ -7,7 +7,7 @@ To run the app, cd schedule-app/client, repeat with cd schedule-app/server (both
 
 Start server: node --env-file=config.env server
 
-Start client: npm run dev
+Start client: npm start
 
 Sources:
 https://www.mongodb.com/resources/languages/mern-stack-tutorial#setting-up-the-project
