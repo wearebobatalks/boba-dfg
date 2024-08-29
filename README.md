@@ -9,5 +9,7 @@ Start server: node --env-file=config.env server
 
 Start client: npm start
 
+Make sure to install Material UI: npm install @mui/material @emotion/react @emotion/styled
+
 Sources:
 https://www.mongodb.com/resources/languages/mern-stack-tutorial#setting-up-the-project
