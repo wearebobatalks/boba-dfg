@@ -4,6 +4,15 @@ require("dotenv/config");
 const cors = require("cors");
 const { OAuth2Client } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const uri = "mongodb+srv://admin:mWu2vMHAQfcDMyay@boba-talks.8ltm5.mongodb.net/?retryWrites=true&w=majority&appName=boba-talks";
+const mongo_client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
 
 app.use(
   cors({
@@ -13,8 +22,29 @@ app.use(
 );
 app.use(express.json());
 
-// Our database
-let DB = [];
+// Connect to the MongoDB client
+async function connectToDB() {
+  try{
+    await mongo_client.connect();
+    return mongo_client.db("boba-talks").collection("users");
+  } catch(err) {
+    console.error(err);
+  }
+}
+async function disconnectDB() {
+  try {
+    await mongo_client.close();
+    res.status(200).json({
+      message: "Database connection closed.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "An error occurred during disconnection.",
+      error: error.message,
+    });
+  }
+};
+
 
 /**
  *  This function is used verify a google account
@@ -48,19 +78,25 @@ app.post("/signup", async (req, res) => {
 
       const profile = verificationResponse?.payload;
 
-      DB.push(profile);
+      // Create a new user object with the necessary fields
+      const user = {
+        firstName: profile?.given_name,
+        lastName: profile?.family_name,
+        picture: profile?.picture,
+        email: profile?.email,
+        token: jwt.sign({ email: profile?.email }, "myScret", {
+          expiresIn: "1d",
+        }),
+      };
+
+      const DB = await connectToDB();
+      // Insert the user into the MongoDB collection
+      await DB.insertOne(user);
+      await disconnectDB();
 
       res.status(201).json({
         message: "Signup was successful",
-        user: {
-          firstName: profile?.given_name,
-          lastName: profile?.family_name,
-          picture: profile?.picture,
-          email: profile?.email,
-          token: jwt.sign({ email: profile?.email }, "myScret", {
-            expiresIn: "1d",
-          }),
-        },
+        user: user,
       });
     }
   } catch (error) {
@@ -82,32 +118,62 @@ app.post("/login", async (req, res) => {
 
       const profile = verificationResponse?.payload;
 
-      const existsInDB = DB.find((person) => person?.email === profile?.email);
 
-      if (!existsInDB) {
-        return res.status(400).json({
-          message: "You are not registered. Please sign up",
+      // Query the database for the user
+      const DB = await connectToDB();
+      const user = await DB.findOne({ email: profile?.email });
+      await disconnectDB();
+
+      if (user) {
+        // User found, proceed with login
+        res.status(200).json({
+          message: "Login successful",
+          user: user,
+        });
+      } else {
+        // User not found, handle accordingly
+        res.status(404).json({
+          message: "User not found",
         });
       }
-
-      res.status(201).json({
-        message: "Login was successful",
-        user: {
-          firstName: profile?.given_name,
-          lastName: profile?.family_name,
-          picture: profile?.picture,
-          email: profile?.email,
-          token: jwt.sign({ email: profile?.email }, process.env.JWT_SECRET, {
-            expiresIn: "1d",
-          }),
-        },
+      }
+    } catch (error) {
+      res.status(500).json({
+        message: "An error occurred during login.",
+        error: error.message,
       });
     }
-  } catch (error) {
-    res.status(500).json({
-      message: error?.message || error,
-    });
-  }
+      
+  console.log(res);
 });
 
+//Figure this out soon!!
+// app.post("/register", async (req, res) => {
+//   try {
+//     const { userId, updates } = req.body; // Assuming the request contains the user ID and an object with the updates
+//     const DB = await connectToDB();
+
+//     const updateResult = await DB.collection("users").updateOne(
+//       { _id: userId }, // Use the unique identifier to find the document
+//       { $set: updates } // updates should be an object with fields to update, e.g., { name: "New Name", email: "new@email.com" }
+//     );
+
+//     await disconnectDB();
+
+//     if (updateResult.modifiedCount === 0) {
+//       return res.status(404).json({
+//         message: "User not found or no updates were necessary.",
+//       });
+//     }
+
+//     res.status(200).json({
+//       message: "User updated successfully",
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "An error occurred during the user update.",
+//       error: error.message,
+//     });
+//   }
+// });
 app.listen("5050", () => console.log("Server running on port 5050"));
