@@ -12,20 +12,32 @@ const Login = () => {
   useEffect(() => {
     /* global google */
     if (window.google) {
-      google.accounts.id.initialize({
-        client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-        callback: handleGoogle,
-      });
+      // Load the Google Identity Services library dynamically if not already loaded
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.onload = () => {
+        // Initialize the Google One Tap sign-in
+        google.accounts.id.initialize({
+          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID, // Replace with your Google Client ID
+          callback: handleGoogle,
+          auto_select: true, // Automatically prompt the user if they've previously signed in
+          context: 'signin',
+        });
 
-      google.accounts.id.renderButton(document.getElementById("loginDiv"), {
-        // type: "standard",
-        theme: "filled_black",
-        // size: "small",
-        text: "signin_with",
-        shape: "pill",
-      });
+        // Prompt for One Tap sign-in or automatic sign-in
+        google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            // Handle cases where the One Tap UI is not displayed or skipped
+          }
+        });
+      };
+      document.body.appendChild(script);
 
-      // google.accounts.id.prompt()
+      // Cleanup function to remove the script when the component unmounts
+      return () => {
+        document.body.removeChild(script);
+      };
     }
   }, [handleGoogle]);
 

@@ -39,12 +39,12 @@ const Home = ({user}) => {
         phone,
         food
       })
-      alert("registration successful")
+      
     } catch (error) {
       alert('Registration failed')
       console.log(error)
     }
-
+    alert("registration successful")
   }
 
   const steps = ["Step 1 of 4", "Step 2 of 4", "Step 3 of 4", "Step 4 of 4"];
