@@ -31,20 +31,6 @@ async function connectToDB() {
     console.error(err);
   }
 }
-async function disconnectDB() {
-  try {
-    await mongo_client.close();
-    res.status(200).json({
-      message: "Database connection closed.",
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "An error occurred during disconnection.",
-      error: error.message,
-    });
-  }
-};
-
 
 /**
  *  This function is used verify a google account
@@ -92,7 +78,6 @@ app.post("/signup", async (req, res) => {
       const DB = await connectToDB();
       // Insert the user into the MongoDB collection
       await DB.insertOne(user);
-      await disconnectDB();
 
       res.status(201).json({
         message: "Signup was successful",
@@ -122,7 +107,6 @@ app.post("/login", async (req, res) => {
       // Query the database for the user
       const DB = await connectToDB();
       const user = await DB.findOne({ email: profile?.email });
-      await disconnectDB();
 
       if (user) {
         // User found, proceed with login
@@ -157,8 +141,6 @@ app.post("/login", async (req, res) => {
 //       { _id: userId }, // Use the unique identifier to find the document
 //       { $set: updates } // updates should be an object with fields to update, e.g., { name: "New Name", email: "new@email.com" }
 //     );
-
-//     await disconnectDB();
 
 //     if (updateResult.modifiedCount === 0) {
 //       return res.status(404).json({
