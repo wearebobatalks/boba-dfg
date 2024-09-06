@@ -31,20 +31,6 @@ async function connectToDB() {
     console.error(err);
   }
 }
-async function disconnectDB() {
-  try {
-    await mongo_client.close();
-    res.status(200).json({
-      message: "Database connection closed.",
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "An error occurred during disconnection.",
-      error: error.message,
-    });
-  }
-};
-
 
 /**
  *  This function is used verify a google account
@@ -64,9 +50,11 @@ async function verifyGoogleToken(token) {
   }
 }
 
+/* Check if user already is registered, if so, send them to the dashboard
+Otherwise, send them to the signup page and update the user's information */
+ 
 app.post("/signup", async (req, res) => {
   try {
-    // console.log({ verified: verifyGoogleToken(req.body.credential) });
     if (req.body.credential) {
       const verificationResponse = await verifyGoogleToken(req.body.credential);
 
@@ -78,7 +66,9 @@ app.post("/signup", async (req, res) => {
 
       const profile = verificationResponse?.payload;
 
-      // Create a new user object with the necessary fields
+      // Query the database for the user
+      const DB = await connectToDB();
+
       const user = {
         firstName: profile?.given_name,
         lastName: profile?.family_name,
@@ -88,64 +78,76 @@ app.post("/signup", async (req, res) => {
           expiresIn: "1d",
         }),
       };
+      
+      const existingUser = await DB.findOne({ email: user.email });
 
-      const DB = await connectToDB();
-      // Insert the user into the MongoDB collection
-      await DB.insertOne(user);
-      await disconnectDB();
+      if(existingUser) {
+        // User found, reroute 
+        console.log("User found, rerouting to dashboard");
+        return res.status(200).json({
+          message: "User found, rerouting to dashboard",
+          user: user
+        });
+      } else {
+        // User not found, proceed with signup
+        console.log("User not found, proceeding with signup");
+        // Insert the user into the MongoDB collection
+        await DB.insertOne(user);
 
-      res.status(201).json({
-        message: "Signup was successful",
-        user: user,
-      });
+        res.status(201).json({
+          message: "Signup was successful",
+          user: user
+        });
+      }
+      
     }
   } catch (error) {
     res.status(500).json({
       message: "An error occured. Registration failed.",
     });
+    console.error(error);
   }
 });
 
-app.post("/login", async (req, res) => {
-  try {
-    if (req.body.credential) {
-      const verificationResponse = await verifyGoogleToken(req.body.credential);
-      if (verificationResponse.error) {
-        return res.status(400).json({
-          message: verificationResponse.error,
-        });
-      }
+// app.post("/login", async (req, res) => {
+//   try {
+//     if (req.body.credential) {
+//       const verificationResponse = await verifyGoogleToken(req.body.credential);
+//       if (verificationResponse.error) {
+//         return res.status(400).json({
+//           message: verificationResponse.error,
+//         });
+//       }
 
-      const profile = verificationResponse?.payload;
+//       const profile = verificationResponse?.payload;
 
 
-      // Query the database for the user
-      const DB = await connectToDB();
-      const user = await DB.findOne({ email: profile?.email });
-      await disconnectDB();
+//       // Query the database for the user
+//       const DB = await connectToDB();
+//       const user = await DB.findOne({ email: profile?.email });
 
-      if (user) {
-        // User found, proceed with login
-        res.status(200).json({
-          message: "Login successful",
-          user: user,
-        });
-      } else {
-        // User not found, handle accordingly
-        res.status(404).json({
-          message: "User not found",
-        });
-      }
-      }
-    } catch (error) {
-      res.status(500).json({
-        message: "An error occurred during login.",
-        error: error.message,
-      });
-    }
+//       if (user) {
+//         // User found, proceed with login
+//         res.status(200).json({
+//           message: "Login successful",
+//           user: user,
+//         });
+//       } else {
+//         // User not found, handle accordingly
+//         res.status(404).json({
+//           message: "User not found",
+//         });
+//       }
+//       }
+//     } catch (error) {
+//       res.status(500).json({
+//         message: "An error occurred during login.",
+//         error: error.message,
+//       });
+//     }
       
-  console.log(res);
-});
+//   console.log(res);
+// });
 
 //Figure this out soon!!
 // app.post("/register", async (req, res) => {
@@ -157,8 +159,6 @@ app.post("/login", async (req, res) => {
 //       { _id: userId }, // Use the unique identifier to find the document
 //       { $set: updates } // updates should be an object with fields to update, e.g., { name: "New Name", email: "new@email.com" }
 //     );
-
-//     await disconnectDB();
 
 //     if (updateResult.modifiedCount === 0) {
 //       return res.status(404).json({
