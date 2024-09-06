@@ -15,6 +15,8 @@ const SignUp = () => {
       google.accounts.id.initialize({
         client_id: "1076864368322-gct1ejsjceb3srdhjsgkjk7armhe1n0v.apps.googleusercontent.com",
         callback: handleGoogle,
+        auto_select: true, // Automatically prompt the user if they've previously signed in
+        context: 'signin',
       });
 
       google.accounts.id.renderButton(document.getElementById("signUpDiv"), {

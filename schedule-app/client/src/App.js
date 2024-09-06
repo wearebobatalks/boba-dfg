@@ -19,11 +19,11 @@ const App = () => {
       <Routes>
         <Route
           path="/"
-          element={user?.email ? <Navigate to="/home" /> : <Landing />}
+          element={user?.email ? <Navigate to="/dashboard" /> : <Landing />}
         />
         <Route
           path="/signup"
-          element={user?.email ? <Navigate to="/home" /> : <Signup />}
+          element={user?.email ? <Navigate to="/dashboard" /> : <Signup />}
         />
         <Route
           path="/login"
