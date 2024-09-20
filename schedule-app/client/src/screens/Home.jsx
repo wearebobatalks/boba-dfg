@@ -14,15 +14,35 @@ const Home = ({user}) => {
   const navigate = useNavigate()
   const [page, setPage] = useState(0);
   const [data, setData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    email: user.email,
+    profilePhoto: '',
     firstName: '',
     lastName: '',
-    address: '',
-    phone: '',
-    food: ''
+    bio: '',
+    linkedinURL: '',
+    education: [],
+    mentorFAQ: [],
+    jobTitle: '',
+    company: '',
+    industry: '',
+    startDateMonth: '',
+    startDateYear: '',
+    endDateMonth: '',
+    endDateYear: '',
+    yearsExperience: '',
+    workExp: [],
+    sundayAvailability: [],
+    mondayAvailability: [],
+    tuesdayAvailability: [],
+    wednesdayAvailability: [],
+    thursdayAvailability: [],
+    fridayAvailability: [],
+    saturdayAvailability: [],
+    meetingLocation: '',
+    meetingDuration: '',
+    noticePeriod: '',
+    topics: [],
+    conversations: [],
   })
 
   const RegisterUser = async (e) => {
@@ -49,8 +69,8 @@ const Home = ({user}) => {
 
   const steps = ["Step 1 of 4", "Step 2 of 4", "Step 3 of 4", "Step 4 of 4"];
   const titles = ["BASIC INFORMATION", "PROFESSIONAL DETAILS", "SESSION SETUP", "REVIEW AND FINISH UP"];
-  const subtitles = ["Set up your personal profile", "Tell us more about you", "Set up your preferences for mentoring sessions", "Take a moment to review and confirm your information"];
-
+  const subtitles = ["Set up your personal profile", "Tell us more about you", "Create your own schedule for mentoring sessions", "Take a moment to review and confirm your information"];
+  const images = ["./2-teabag.png", "3-CookingBoba.svg", "4-Addingmilk.svg", "5-Addingice.svg"];
   const PageDisplay = () => {
     if (page === 0) {
       return <BasicInfo data={data} setData={setData}/>
@@ -66,11 +86,11 @@ const Home = ({user}) => {
   return (
     <div>
          <div style={{ marginTop: '10px', marginRight: '10px'}}>
-            <a href="https://bobatalks.com"><img src={"./Bobatalk-Logo-darkblue.png"} alt="bobtalks logo" style={{width:'20%', height:'20%'}}/></a>
+            <a href="https://bobatalks.com"><img src={"./Company Logo.svg"} alt="bobtalks logo" style={{width:'20%', height:'20%'}}/></a>
          </div>
         <div className='bg-gradient-to-r from-slate-100 to-red-600 w-full h-screen min-h-full flex flex-col justify-center py-36 sm:px-6 lg:px-8 z-100 mf:h-screen' style={{ width: '90%', marginTop: "50px"}}>
           <div style={{ float: 'left', width: '40%', marginLeft: "70px", marginTop: "60px"}}>
-            <img src={"./2-teabag.png"} alt="tea bags" style={{width:'60%', height:'60%'}}/>
+            <img src={images[page]} alt="tea bags" style={{width:'60%', height:'60%'}}/>
           </div>
           <div style={{ float: 'right'}}>
           <div className='sm:mx-auto sm:w-full sm:max-w-md'>
