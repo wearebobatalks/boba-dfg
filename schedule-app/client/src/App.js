@@ -23,7 +23,7 @@ const App = () => {
         />
         <Route
           path="/signup"
-          element={user?.email ? <Navigate to="/dashboard" /> : <Signup />}
+          element={user?.email ? <Navigate to="/home" /> : <Signup />}
         />
         <Route
           path="/login"

@@ -114,7 +114,7 @@ html {background-color: rgb(242, 196, 148)}
     font-style: italic;
   }
   
-  .required:after {
+  .required:before {
     content:" *";
     color: red;
   }

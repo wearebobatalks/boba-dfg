@@ -79,7 +79,7 @@ app.post("/signup", async (req, res) => {
         }),
       };
       
-      const existingUser = await DB.findOne({ email: user.email });
+      /*const existingUser = await DB.findOne({ email: user.email });
 
       if(existingUser) {
         // User found, reroute 
@@ -98,7 +98,15 @@ app.post("/signup", async (req, res) => {
           message: "Signup was successful",
           user: user
         });
-      }
+      } */
+      console.log("User not found, proceeding with signup");
+      // Insert the user into the MongoDB collection
+      await DB.insertOne(user);
+
+      res.status(201).json({
+        message: "Signup was successful",
+        user: user
+      });
       
     }
   } catch (error) {

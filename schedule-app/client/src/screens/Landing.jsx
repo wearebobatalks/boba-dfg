@@ -7,7 +7,7 @@ const Landing = () => {
   return (
     <>
       <div style={{ marginTop: '10px', marginRight: '10px'}}>
-        <a href="https://bobatalks.com"><img src={"./Bobatalk-Logo-darkblue.png"} alt="bobtalks logo" style={{width:'20%', height:'20%'}}/></a>
+        <a href="https://bobatalks.com"><img src={"./Company Logo.svg"} alt="bobtalks logo" style={{width:'20%', height:'20%'}}/></a>
       </div>
       <div style={{ float: 'left', width: '60%', marginTop: '150px', marginLeft: '0px'}}>
         <img src={"./1-Boba-Food-truck.png"} alt="boba food truck" style={{width:'50%', height:'50%'}}/>

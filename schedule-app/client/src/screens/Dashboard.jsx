@@ -13,6 +13,10 @@ import ListItemText from '@mui/material/ListItemText';
 const drawerWidth = 100;
 
 const Dashboard = ({user}) => {
+  const logout = () => {
+    localStorage.removeItem("user");
+    window.location.reload();
+  };
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
@@ -54,6 +58,17 @@ const Dashboard = ({user}) => {
         <Typography sx={{ marginBottom: 2 }}>
           Session Settings
         </Typography>
+        <button 
+              onClick={logout}
+              style={{
+                color: "black",
+                border: "none",
+                backgroundColor: "rgb(242, 196, 148)",
+                padding: "0.5rem 1rem",
+                cursor: "pointer",
+              }}>
+                Switch account
+          </button> 
       </Box>
     </Box>
   );
